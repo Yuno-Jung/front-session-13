@@ -9,11 +9,14 @@ const New = () => {
     const { onCreate } = useContext(DiaryDispatchContext)
     const nav = useNavigate();
 
-    const onSubmit = (input) => {
-        onCreate(input.createdDate.getTime(), input.emotionId, input.content)
-        // replace 옵션 : 뒤로가기를 방지하면서 페이지 이동하는 옵션
-        nav('/', {replace: true})
+   const onSubmit = async (input) => {
+    try {
+        await onCreate(input.createdDate.getTime(), input.emotionId, input.content);
+        nav('/', { replace: true });
+    } catch (error) {
+        alert("일기 등록 중 문제가 발생했습니다.");
     }
+    };
 
     return (
         <div>

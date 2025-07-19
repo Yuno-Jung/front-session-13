@@ -6,7 +6,6 @@ import { useState } from "react"
 
 const DiaryList = ({data}) => {
     const nav = useNavigate();
-
     const [sortType, setSortType] = useState("latest");
 
     const onChangeSortType = (e) => {
@@ -20,22 +19,24 @@ const DiaryList = ({data}) => {
     // 자바스크립트의 정렬 함수들은 기본적으로 사전순으로 비교함 -> data라는 일기 데이터 객체값을 비교할 때는
     // 제대로 작동되지 않음 -> 비교 함수를 직접 콜백 함수로 넣어줘야 함
     const getSortedData = () => {
-        return data.toSorted((a,b) => {
+        if (!Array.isArray(data)) return []; // data가 배열이 아니면 빈 배열 반환
+        // toSorted 대신 slice().sort() 사용해서 복사본 정렬
+        return data.slice().sort((a, b) => {
             if(sortType === "oldest") {
                 return Number(a.createdDate) - Number(b.createdDate);
             } else {
                 return Number(b.createdDate) - Number(a.createdDate);
             }
-        })
+        });
     }
-
     // 컴포넌트가 리렌더링 될 때마다 sortedData라는 이름의 변수에 getSortedData() 함수를 호출한 결과를 저장
     const sortedData = getSortedData();
+    console.log("DiaryList.jsx - 렌더링시 data:", data);
 
     return (
         <div className="DiaryList">
             <div className="menu_bar">
-                <select onChange={onChangeSortType}>
+                <select value={sortType} onChange={onChangeSortType}>
                     <option value={"latest"}>최신순</option>
                     <option value={"oldest"}>오래된순</option>
                 </select>

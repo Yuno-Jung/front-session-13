@@ -6,6 +6,7 @@ import { useContext, useEffect, useState } from "react"
 import { DiaryDispatchContext, DiaryStateContext } from "../App"
 import DiaryItem from '../components/DiaryItem';
 import useDiary from "../hooks/useDiary"
+import { deleteDiary } from "../apis/diary";
 
 const Edit = () => {
     // useParams : 리액트 라우터의 URL 파라미터를 불러오는 Hook
@@ -16,17 +17,19 @@ const Edit = () => {
     
     const curDiaryItem = useDiary(params.id);
 
-    const onClickDelete = () => {
+    
+    const onClickDelete = async () => {
         if (
-        // 브라우저의 내장기능을 활용하는 함수 : 확인과 취소 버튼이 달려있는 팝업창을 발생시키는 기능
-        // 인수로 팝업에 나타날 메세지를 넣으면 됨
-        // 확인을 선택하면 true가 반환되고 취소를 선택하면 flase가 반환됨
-        window.confirm("일기를 정말 삭제할까요? 다시 복구되지 않아요")
-        ) {
-            // 일기 삭제 로직
-            // App.jsx에서 onDelete 함수의 인수로 id를 받고 있기 때문
-            onDelete(params.id);
-            nav("/", {replace: true});
+            window.confirm("일기를 정말 삭제할까요? 다시 복구되지 않아요")
+            ) {
+            try {
+                await deleteDiary(params.id); // 백엔드에 DELETE 요청
+                onDelete(params.id);
+                nav("/", { replace: true });  // 홈으로 이동
+            } catch (error) {
+                alert("삭제 중 오류가 발생했습니다.");
+                console.error(error);
+            }
         }
     }
 
@@ -48,15 +51,38 @@ const Edit = () => {
     // const currentDiaryItem = getCurrentDiaryItem();
     // console.log(currentDiaryItem)
 
-    const onSubmit = (input) => {
-        if (
-            window.confirm("일기를 정말 수정할까요?")
-        ) {
-            // Editor 컴포넌트의 input state의 createdDate 값은 데이트 객체이기 때문에 타임 스탬프로 변환
-            onUpdate(params.id, input.createdDate.getTime(), input.emotionId, input.content);
-            nav('/',{replace: true})
-        }
-    }
+    const onSubmit = async (input) => {
+  if (!input.content || input.content.trim().length === 0) {
+      alert("내용을 입력해주세요.");
+      return;
+  }
+  if (input.emotionId <= 0 || input.emotionId > 5) {
+      alert("유효하지 않은 감정입니다.");
+      return;
+  }
+
+  if (window.confirm("일기를 정말 수정할까요?")) {
+      try {
+          let createdDate;
+          if (input.createdDate instanceof Date) {
+            createdDate = input.createdDate;
+          } else {
+            createdDate = new Date(input.createdDate);
+          }
+
+          const updated = await onUpdate(
+              params.id,
+              createdDate.getTime(),
+              input.emotionId,
+              input.content
+          );
+          nav("/", { replace: true });
+      } catch (error) {
+          alert("수정 중 오류가 발생했습니다.");
+          console.error(error);
+      }
+  }
+};
 
     return  (
         <div>

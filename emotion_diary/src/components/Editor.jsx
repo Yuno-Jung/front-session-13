@@ -16,19 +16,14 @@ const Editor = ({ initData, onSubmit }) => {
   const nav = useNavigate();
 
   // initData가 변경이 될 때마다 callback 함수 안에서 if 문으로 initData가 실제 존재한다면 (제대로 일기 데이터를 불러왔다면)
-  useEffect(() => {
-    if (initData) {
-      setInput({
-        ...initData,
-        // app 컴포넌트의 mockData와 같이 getTime() 메서드를 이용해 타임스탬프 형태로
-        // createdDate 날짜 저장
-        // 하지만 Editor 컴포넌트 input state createdDate 값은 데이트 객체 형태로 보관하고 있음
-        // (사용자로부터 날짜 입력을 직접 입력받기 위해))
-        // createdDate에 한해서만 new Date()로 initData를 date 객체로 변환시켜 넘겨줌
-        // 타임스탬프 값이 문자열로 넘어갈 수도 있기에 Number()로 명시적 형변환
-        createdDate: new Date(Number(initData.createdDate)),
-      });
-    }
+ useEffect(() => {
+      if (initData) {
+          setInput({
+              createdDate: new Date(initData.createdDate), // ✅ Date 객체로 변환
+              emotionId: initData.emotionId,
+              content: initData.content,
+          });
+      }
   }, [initData]);
 
   const onChangeInput = (e) => {
@@ -50,8 +45,16 @@ const Editor = ({ initData, onSubmit }) => {
   };
 
   const onClickSubmitButton = () => {
-    onSubmit(input);
-  };
+    const finalInput = {
+      ...input,
+      createdDate:
+        input.createdDate instanceof Date
+          ? input.createdDate.getTime()
+          : input.createdDate,  // 이미 숫자면 그대로 유지
+    };
+
+    onSubmit(finalInput);
+};
 
   return (
     <div className="Editor">

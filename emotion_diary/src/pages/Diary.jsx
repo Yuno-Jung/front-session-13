@@ -16,8 +16,8 @@ const Diary = () => {
     }
 
     // if 문에 걸리지 않으면 curDiaryItem으로부터 구조분해 할당으로 꺼내기
-    const {currentDate, emotionId, content } = curDiaryItem;
-    const title = getStringedDate(new Date(currentDate))
+    const {createdDate, emotionId, content } = curDiaryItem;
+    const title = getStringedDate(new Date(createdDate))
 
     return (
         <div>
