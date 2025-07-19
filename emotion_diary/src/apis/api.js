@@ -1,7 +1,9 @@
 import axios from "axios";
 
+const BASE_URL = "/api";
+
 const instance = axios.create({
-  baseURL: "http://api.opaue.shop",
+  baseURL: BASE_URL,
   timeout: 5000,
 });
 
