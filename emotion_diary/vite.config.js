@@ -6,7 +6,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'http://api.opaue.shop',  // 실제 API 서버 주소
+        target: 'https://api.opaue.shop',  // 실제 API 서버 주소
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, ''),
       },

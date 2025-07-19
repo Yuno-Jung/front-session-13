@@ -1,6 +1,9 @@
 import axios from "axios";
 
-const BASE_URL = "/api";
+// 개발 환경이면 프록시 주소, 배포 환경이면 실제 주소
+const BASE_URL = import.meta.env.DEV
+  ? "/api"
+  : "https://api.opaue.shop";
 
 const instance = axios.create({
   baseURL: BASE_URL,
